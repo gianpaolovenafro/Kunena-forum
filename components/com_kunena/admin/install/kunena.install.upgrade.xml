@@ -641,6 +641,11 @@
 				AFTER `userid`
 			</query>
 		</version>
+		<version version="3.0.99"
+		         versiondate="2015-03-21"
+		         versionname="Internal">
+			<phpfile name="3.1.0-2015-03-21_defaulttemplate"></phpfile>
+		</version>
 		<version version="@kunenaversion@"
 		         versiondate="@kunenaversiondate@"
 		         versionname="@kunenaversionname@">
