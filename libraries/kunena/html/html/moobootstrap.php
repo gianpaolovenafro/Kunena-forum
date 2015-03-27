@@ -9,8 +9,6 @@
 
 defined ( '_JEXEC' ) or die ();
 
-jimport('joomla.html.html');
-
 /**
  * Utility class for Bootstrap elements (written in Mootools).
  *
@@ -76,6 +74,7 @@ abstract class JHtmlMooBootstrap
 	public static function carousel($selector = 'carousel', $params = array())
 	{
 		$sig = md5(serialize(array($selector, $params)));
+
 		if (!isset(self::$loaded[__METHOD__][$sig]))
 		{
 			// Include Bootstrap framework
@@ -186,6 +185,7 @@ abstract class JHtmlMooBootstrap
 	public static function modal($selector = 'modal', $params = array())
 	{
 		$sig = md5(serialize(array($selector, $params)));
+
 		if (!isset(self::$loaded[__METHOD__][$sig]))
 		{
 			// Include Bootstrap framework
@@ -420,6 +420,7 @@ abstract class JHtmlMooBootstrap
 	public static function startAccordion($selector = 'myAccordian', $params = array())
 	{
 		$sig = md5(serialize(array($selector, $params)));
+
 		if (!isset(self::$loaded[__METHOD__][$sig]))
 		{
 			// Include Bootstrap framework
@@ -511,6 +512,7 @@ abstract class JHtmlMooBootstrap
 	public static function startPane($selector = 'myTab', $params = array())
 	{
 		$sig = md5(serialize(array($selector, $params)));
+
 		if (!isset(self::$loaded[__METHOD__][$sig]))
 		{
 			// Include Bootstrap framework

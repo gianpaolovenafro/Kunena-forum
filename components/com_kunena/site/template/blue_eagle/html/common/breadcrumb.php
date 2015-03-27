@@ -4,18 +4,23 @@
  * @package Kunena.Template.Blue_Eagle
  * @subpackage Common
  *
- * @copyright (C) 2008 - 2013 Kunena Team. All rights reserved.
+ * @copyright (C) 2008 - 2015 Kunena Team. All rights reserved.
  * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL
  * @link http://www.kunena.org
  **/
 defined ( '_JEXEC' ) or die ();
 
 $item = array_shift($this->pathway);
+
+if(empty($this->breadcrumbs_count))
+{
+    $this->breadcrumbs_count = 1;
+}
 ?>
 
 <?php if ($item) : ?>
-<div class="kblock kpathway">
-	<div class="kcontainer" id="pathway_tbody">
+<div class="kblock kpathway breadcrumbs-<?php echo $this->breadcrumbs_count; ?>">
+	<div class="kcontainer">
 		<div class="ksectionbody">
 			<div class = "kforum-pathway">
 				<div class="path-element-first"><a href="<?php echo $item->link ?>"><?php echo $item->name ?></a></div>
@@ -26,4 +31,5 @@ $item = array_shift($this->pathway);
 		</div>
 	</div>
 </div>
-<?php endif ?>
+<?php $this->breadcrumbs_count++; ?>
+<?php endif; ?>

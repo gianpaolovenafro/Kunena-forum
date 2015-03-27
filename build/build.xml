@@ -5,7 +5,7 @@
 
   @package		Kunena
   @subpackage	com_kunena
-  @copyright	Copyright (C) 2008 - 2013 Kunena Team. All rights reserved.
+  @copyright	Copyright (C) 2008 - 2015 Kunena Team. All rights reserved.
   				portions (C) 2007 MjazTools. All rights reserved.
   @license		GNU General Public License <http://www.gnu.org/copyleft/gpl.html>
   @link			http://www.kunena.org
@@ -103,13 +103,22 @@
 			<istrue value="${cfg.bz2}" />
 		</condition>
 
-		<copy todir="${tmp_dir}/packages">
-			<fileset dir="${project_dir}" />
-			<firstmatchmapper>
-				<mapper type="regexp" from="^libraries/(.*)$$" to="lib_\1"/>
-				<mapper type="regexp" from="^media/([^/]*)/(.*)$$" to="\1_media/\2"/>
-				<mapper type="glob" from="plugins/*" to="*"/>
-			</firstmatchmapper>
+		<copy todir="${tmp_dir}/packages/lib_kunena" overwrite="true">
+			<fileset dir="${project_dir}/libraries/kunena"/>
+		</copy>
+        <copy todir="${tmp_dir}/packages/plg_content_kunena" overwrite="true">
+            <fileset dir="${project_dir}/plugins/plg_content_kunena"/>
+        </copy>
+		<copy todir="${tmp_dir}/packages/plg_system_kunena" overwrite="true">
+			<fileset dir="${project_dir}/plugins/plg_system_kunena"/>
+		</copy>
+		<copy todir="${tmp_dir}/packages/plg_quickicon_kunena" overwrite="true">
+			<fileset dir="${project_dir}/plugins/plg_quickicon_kunena"/>
+		</copy>
+		<copy todir="${tmp_dir}/packages/kunena_media" overwrite="true">
+			<fileset dir="${project_dir}/media/kunena">
+				<exclude name="${project_dir}/media/kunena/external/**"/>
+			</fileset>
 		</copy>
 		<copy todir="${tmp_dir}/packages/com_kunena">
 			<fileset dir="${project_dir}/${kunena.admin}">
@@ -131,34 +140,44 @@
 		<filter token="kunenaversionname" value="${xml.versionname}" />
 
 		<!-- Add version information to all xml files and forum.php -->
-		<copy todir="${tmp_dir}/packages" overwrite="true" filtering="true">
-			<fileset dir="${project_dir}">
-				<include name="libraries/kunena/forum/forum.php"/>
+		<copy todir="${tmp_dir}/packages/lib_kunena" overwrite="true" filtering="true">
+			<fileset dir="${project_dir}/libraries/kunena">
+				<include name="forum/forum.php"/>
 				<include name="**/*.xml"/>
 			</fileset>
-			<firstmatchmapper>
-				<mapper type="regexp" from="^libraries/(.*)$$" to="lib_\1"/>
-				<mapper type="regexp" from="^media/([^/]*)/(.*)$$" to="\1_media/\2"/>
-				<mapper type="glob" from="plugins/*" to="*"/>
-			</firstmatchmapper>
+		</copy>
+        <copy todir="${tmp_dir}/packages/plg_content_kunena" overwrite="true" filtering="true">
+            <fileset dir="${project_dir}/plugins/plg_content_kunena">
+                <include name="**/*.xml"/>
+            </fileset>
+        </copy>
+		<copy todir="${tmp_dir}/packages/plg_system_kunena" overwrite="true" filtering="true">
+			<fileset dir="${project_dir}/plugins/plg_system_kunena">
+				<include name="**/*.xml"/>
+			</fileset>
+		</copy>
+		<copy todir="${tmp_dir}/packages/plg_quickicon_kunena" overwrite="true" filtering="true">
+			<fileset dir="${project_dir}/plugins/plg_quickicon_kunena">
+				<include name="**/*.xml"/>
+			</fileset>
+		</copy>
+		<copy todir="${tmp_dir}/packages/kunena_media" overwrite="true" filtering="true">
+			<fileset dir="${project_dir}/media/kunena">
+				<include name="**/*.xml"/>
+			</fileset>
 		</copy>
 		<copy todir="${tmp_dir}/packages/com_kunena" overwrite="true" filtering="true">
 			<fileset dir="${project_dir}/${kunena.admin}">
 				<include name="**/*.xml"/>
-				<include name="language/index.html"/>
 				<exclude name="language/**/*.xml"/>
 			</fileset>
 		</copy>
 		<copy todir="${tmp_dir}/packages/com_kunena/site" overwrite="true" filtering="true">
 			<fileset dir="${project_dir}/${kunena.site}">
 				<include name="**/*.xml"/>
-				<include name="language/index.html"/>
 				<exclude name="language/**/*.xml"/>
 			</fileset>
 		</copy>
-
-		<!-- Remove Crypsis template -->
-		<delete dir="${tmp_dir}/packages/com_kunena/site/template/crypsis" />
 
 		<!-- Move files needed by the installer -->
 		<copy file="${project_dir}/pkg_kunena.xml" todir="${build_dir}" overwrite="true" filtering="true" />
@@ -202,13 +221,11 @@
 			<copy todir="${tmp_dir}/languages/@{tag}/admin" flatten="yes" includeEmptyDirs="no" overwrite="true">
 				<fileset dir="${project_dir}/${kunena.admin}">
 					<include name="**/@{tag}.*.ini"/>
-					<include name="index.html"/>
 				</fileset>
 			</copy>
 			<copy todir="${tmp_dir}/languages/@{tag}/site" flatten="yes" includeEmptyDirs="no" overwrite="true">
 				<fileset dir="${project_dir}/${kunena.site}">
 					<include name="**/@{tag}.*.ini"/>
-					<include name="index.html"/>
 				</fileset>
 			</copy>
 			<if>
@@ -227,11 +244,6 @@
 							<include name="*.install.ini"/>
 						</fileset>
 					</move>
-					<copy todir="${tmp_dir}/packages/com_kunena/language/@{tag}">
-						<fileset dir="${tmp_dir}/languages/@{tag}/admin">
-							<include name="index.html"/>
-						</fileset>
-					</copy>
 					<archive destfile="${tmp_dir}/languages_extra/language/com_kunena_@{tag}_v${xml.version}" basedir="${tmp_dir}/languages/@{tag}"/>
 				</else>
 			</if>
@@ -272,6 +284,7 @@
 	<target name="copy" depends="minify">
 		<mkdir dir="${tmp_dir}/languages" />
 		<language tag="en-GB" include="true" />
+		<language tag="af-ZA" />
 		<language tag="ar-AA" />
 		<language tag="az-AZ" />
 		<language tag="bg-BG" />
@@ -326,6 +339,7 @@
 		<language tag="zh-TW" />
 
 		<archive destfile="${build_dir}/packages/plg_system_kunena${str.version}" basedir="${tmp_dir}/packages/plg_system_kunena" />
+		<archive destfile="${build_dir}/packages/plg_content_kunena${str.version}" basedir="${tmp_dir}/packages/plg_content_kunena" />
 		<archive destfile="${build_dir}/packages/plg_quickicon_kunena${str.version}" basedir="${tmp_dir}/packages/plg_quickicon_kunena" />
 		<archive destfile="${build_dir}/packages/lib_kunena${str.version}" basedir="${tmp_dir}/packages/lib_kunena" />
 		<archive destfile="${build_dir}/packages/com_kunena${str.version}" basedir="${tmp_dir}/packages/com_kunena" />

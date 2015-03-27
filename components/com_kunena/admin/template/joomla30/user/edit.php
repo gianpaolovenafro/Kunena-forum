@@ -4,7 +4,7 @@
  * @package Kunena.Administrator.Template
  * @subpackage Users
  *
- * @copyright (C) 2008 - 2013 Kunena Team. All rights reserved.
+ * @copyright (C) 2008 - 2015 Kunena Team. All rights reserved.
  * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL
  * @link http://www.kunena.org
  **/
@@ -16,19 +16,27 @@ JHtml::_('behavior.tooltip');
 JHtml::_('behavior.multiselect');
 JHtml::_('dropdown.init');
 
+if (version_compare(JVERSION, '3.2', '>'))
+{
+	JHtml::_('behavior.tabstate');
+}
+
 $db = JFactory::getDBO();
 $document = JFactory::getDocument();
-$document->addScriptDeclaration(' var current_count = '.JString::strlen($this->user->signature).'
-var max_count = '.(int) $this->config->maxsig.'
+$document->addScriptDeclaration(' var max_count = '.(int) $this->config->maxsig.'
+jQuery(function($) {
+	jQuery(\'#user-signature\').keypress(function (e) {
+		var len = jQuery(this).val().length;
+		if (len > max_count) {
+			e.preventDefault();
+		} else if (len <= max_count) {
+			var char = max_count - len;
 
-function textCounter(field, target) {
-	if (field.value.length > max_count) {
-		field.value = field.value.substring(0, max_count);
-	} else {
-		current_count = max_count - field.value.length;
-		target.value = current_count;
-	}
-}');
+			jQuery(\'#current_count\').val(char);
+		}
+	});
+});
+');
 ?>
 
 <div id="kunena" class="admin override">
@@ -72,15 +80,15 @@ function textCounter(field, target) {
 								<fieldset>
 									<legend><?php echo JText::_('COM_KUNENA_GEN_SIGNATURE'); ?>:</legend>
 									<div>
-										<textarea class="input-xxlarge" name="signature" cols="4" rows="6"
-											onkeyup="textCounter(this, this.form.current_count);"><?php echo $this->escape( $this->user->signature ); ?></textarea>
+										<textarea id="user-signature" class="input-xxlarge" name="signature" cols="4" rows="6"
+											><?php echo $this->escape( $this->user->signature ); ?></textarea>
 									</div>
 									<div>
 										<label><input type="checkbox" value="1" name="deleteSig" /> <?php echo JText::_('COM_KUNENA_DELSIG'); ?></label>
 									</div>
 									<div>
 										<?php echo JText::sprintf('COM_KUNENA_SIGNATURE_LENGTH_COUNTER', intval($this->config->maxsig),
-											'<input class="span1" readonly="readonly" type="text" name="current_count" value="'.(intval($this->config->maxsig)-JString::strlen($this->user->signature)).'" />');?>
+											'<input id="current_count" class="span1" readonly="readonly" type="text" name="current_count" value="'.(intval($this->config->maxsig)-JString::strlen($this->user->signature)).'" />');?>
 									</div>
 								</fieldset>
 							</div>
@@ -297,11 +305,10 @@ function textCounter(field, target) {
 									</thead>
 									<?php
 										if (!empty($this->subscatslist)) : foreach($this->subscatslist as $cat) :
-											$category = KunenaForumCategoryHelper::get($cat->category_id);
 									?>
 									<tr>
-										<td><?php echo $this->escape($category->name); ?> <small><?php echo JText::sprintf('JGLOBAL_LIST_ALIAS', $this->escape($category->alias)); ?></small></td>
-										<td><?php echo $this->escape($category->id); ?></td>
+										<td><?php echo $this->escape($cat->name); ?> <small><?php echo JText::sprintf('JGLOBAL_LIST_ALIAS', $this->escape($cat->alias)); ?></small></td>
+										<td><?php echo $this->escape($cat->id); ?></td>
 									</tr>
 									<?php endforeach; else : ?>
 									<tr>
@@ -315,7 +322,7 @@ function textCounter(field, target) {
 						<div class="tab-pane" id="tab5">
 							<fieldset>
 								<legend><?php echo JText::_('COM_KUNENA_SUBFOR') . ' ' . $this->escape($this->user->username); ?></legend>
-								<table class="kadmin-adminform">
+								<table class="table table-striped">
 									<thead>
 										<tr>
 	<?php /*
@@ -329,8 +336,7 @@ function textCounter(field, target) {
 									</thead>
 
 									<?php
-										if ($this->sub) : foreach ( $this->sub as $sub ) :
-											$topic = KunenaForumTopicHelper::get($sub->thread);
+										if ($this->sub) : foreach ( $this->sub as $topic ) :
 									?>
 									<tr>
 										<td><?php echo $this->escape($topic->subject); ?></td>
@@ -348,7 +354,7 @@ function textCounter(field, target) {
 						<div class="tab-pane" id="tab6">
 							<fieldset>
 								<legend><?php echo JText::sprintf('COM_KUNENA_IPFOR', $this->escape($this->user->username)); ?></legend>
-								<table class="kadmin-adminform">
+								<table class="table table-striped">
 									<?php
 									$i=0; foreach ($this->ipslist as $ip => $list) :
 										$userlist = array();
